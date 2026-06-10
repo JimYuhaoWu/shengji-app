@@ -11,13 +11,24 @@ const useGameStore = create((set, get) => ({
   phase: null,
   currentPlayer: null,
   myHand: [],
+  handsSize: [],          // card count per player (opponents' hands stay hidden)
   legalActions: [],
+  legalActionsTruncated: false,  // KITTY phase: too many actions to send
   currentTrick: [],
-  scores: 0,
+  tricksWon: [],
+  scores: [],             // array per the engine (NOT a scalar)
   trumpSuit: null,
   trumpLevel: null,
+  trumpLocked: false,
+  currentTrumpBid: null,  // {count, suit, bidder_id}
   dealerId: null,
+  cardsDealt: 0,
   playerLevels: [],
+  calledRank: null,
+  calledSuit: null,
+  helperPlayers: [],
+  kitty: null,            // dealer-only, during KITTY phase
+  buriedCards: null,      // revealed at SCORING
   connectedPlayers: [],
 
   // Local UI state
@@ -58,18 +69,31 @@ const useGameStore = create((set, get) => ({
         break
 
       case 'state_update':
+        // NOTE: state_update does NOT carry connected_players — that field comes
+        // only from joined / player_connected / player_disconnected. Do not reset it here.
         set({
           phase: msg.phase,
           currentPlayer: msg.current_player,
+          myPlayerId: msg.your_player_id ?? get().myPlayerId,
           myHand: msg.your_hand || [],
+          handsSize: msg.hands_size || [],
           legalActions: msg.legal_actions || [],
+          legalActionsTruncated: msg.legal_actions_truncated || false,
           currentTrick: msg.current_trick || [],
-          scores: msg.scores || 0,
+          tricksWon: msg.tricks_won || [],
+          scores: msg.scores || [],
           trumpSuit: msg.trump_suit,
           trumpLevel: msg.trump_level,
+          trumpLocked: msg.trump_locked || false,
+          currentTrumpBid: msg.current_trump_bid || null,
           dealerId: msg.dealer_id,
+          cardsDealt: msg.cards_dealt || 0,
           playerLevels: msg.player_levels || [],
-          connectedPlayers: msg.connected_players || [],
+          calledRank: msg.called_rank ?? null,
+          calledSuit: msg.called_suit ?? null,
+          helperPlayers: msg.helper_players || [],
+          kitty: msg.kitty || null,
+          buriedCards: msg.buried_cards || null,
           selectedCards: [],
         })
         break
@@ -120,14 +144,14 @@ const useGameStore = create((set, get) => ({
   },
 
   submitAction: () => {
-    const { ws, selectedCards, legalActions, myPlayerId } = get()
+    const { ws, selectedCards, legalActions } = get()
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       console.error('WebSocket not connected')
       return
     }
     if (selectedCards.length === 0) return
 
-    // Find matching action by cards
+    // Find the matching pre-computed legal action by its cards.
     const matchingAction = legalActions.find((action) =>
       selectedCards.length === action.cards?.length &&
       selectedCards.every((sc) =>
@@ -142,20 +166,30 @@ const useGameStore = create((set, get) => ({
       return
     }
 
-    // Send action to server
+    // The server's "action" path selects state.legal_actions[index]; each
+    // serialized action carries its own index. Echo that index back.
     try {
-      const message = {
-        type: 'action',
-        cards: selectedCards.map((c) => ({
-          suit: c.suit,
-          rank: c.rank,
-          deck_id: c.deck_id || 0,
-        })),
-      }
-      ws.send(JSON.stringify(message))
+      ws.send(JSON.stringify({ type: 'action', index: matchingAction.index }))
       set({ selectedCards: [] })
     } catch (error) {
       console.error('Failed to send action:', error)
+    }
+  },
+
+  // Send a raw semantic message (bid_trump, pass_trump, take_kitty, call_helper,
+  // play_cards, next_game). Used by special-action UIs in Phase 6.
+  sendMessage: (message) => {
+    const { ws } = get()
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket not connected')
+      return false
+    }
+    try {
+      ws.send(JSON.stringify(message))
+      return true
+    } catch (error) {
+      console.error('Failed to send message:', error)
+      return false
     }
   },
 
