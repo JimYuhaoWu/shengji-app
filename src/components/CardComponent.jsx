@@ -1,3 +1,5 @@
+import { cardImagePath } from '../utils/cardUtils'
+
 export default function CardComponent({ card, isSelected, isLegal, isFaceDown, onClick }) {
   if (!card && !isFaceDown) {
     return <div className="card placeholder" />
@@ -17,21 +19,7 @@ export default function CardComponent({ card, isSelected, isLegal, isFaceDown, o
     )
   }
 
-  const suitSymbol = {
-    H: '♥',
-    D: '♦',
-    C: '♣',
-    S: '♠',
-    J: '🃏',
-  }[card.suit] || '?'
-
-  const suitColor = {
-    H: '#e63946',
-    D: '#e63946',
-    C: '#000',
-    S: '#000',
-    J: '#c8954a',
-  }[card.suit] || '#000'
+  const imagePath = cardImagePath(card)
 
   return (
     <div
@@ -41,27 +29,23 @@ export default function CardComponent({ card, isSelected, isLegal, isFaceDown, o
       style={{
         cursor: isLegal ? 'pointer' : 'not-allowed',
         opacity: isLegal ? 1 : 0.4,
+        padding: 0,
+        overflow: 'hidden',
       }}
     >
-      <div className="card-inner">
-        <div className="card-corner top-left">
-          <div className="rank">{card.rank}</div>
-          <div className="suit" style={{ color: suitColor }}>
-            {suitSymbol}
-          </div>
-        </div>
-        <div className="card-center">
-          <div className="suit large" style={{ color: suitColor }}>
-            {suitSymbol}
-          </div>
-        </div>
-        <div className="card-corner bottom-right">
-          <div className="rank">{card.rank}</div>
-          <div className="suit" style={{ color: suitColor }}>
-            {suitSymbol}
-          </div>
-        </div>
-      </div>
+      <img
+        src={imagePath}
+        alt={`${card.rank}${card.suit}`}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+        onError={(e) => {
+          console.error('Failed to load card image:', imagePath)
+          e.target.style.display = 'none'
+        }}
+      />
     </div>
   )
 }

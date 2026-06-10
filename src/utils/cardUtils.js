@@ -90,9 +90,46 @@ export function getSelectableCards(hand, legalActions, selectedCards) {
   )
 }
 
-// Card image path
+// Card image path - maps internal format to downloaded SVG filenames
 export function cardImagePath(card) {
-  if (card.rank === 'Js') return '/cards/joker-small.svg'
-  if (card.rank === 'Jl') return '/cards/joker-large.svg'
-  return `/cards/${card.rank.toLowerCase()}-${card.suit.toLowerCase()}.svg`
+  const rankMap = {
+    '2': '2',
+    '3': '3',
+    '4': '4',
+    '5': '5',
+    '6': '6',
+    '7': '7',
+    '8': '8',
+    '9': '9',
+    T: '10',
+    J: 'jack',
+    Q: 'queen',
+    K: 'king',
+    A: 'ace',
+    Js: 'joker-small', // Small joker
+    Jl: 'joker-large', // Large joker
+  }
+
+  const suitMap = {
+    H: 'hearts',
+    D: 'diamonds',
+    C: 'clubs',
+    S: 'spades',
+    J: 'joker',
+  }
+
+  const rank = rankMap[card.rank]
+  const suit = suitMap[card.suit]
+
+  if (!rank) {
+    console.warn('Unknown rank:', card.rank)
+    return '/cards/ace_of_hearts.svg'
+  }
+
+  // Jokers
+  if (card.rank === 'Js') return '/cards/black_joker.svg'
+  if (card.rank === 'Jl') return '/cards/red_joker.svg'
+
+  // Regular cards: [rank]_of_[suit].svg
+  return `/cards/${rank}_of_${suit}.svg`
 }
