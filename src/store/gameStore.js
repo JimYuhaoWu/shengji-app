@@ -22,6 +22,7 @@ const useGameStore = create((set, get) => ({
 
   // Local UI state
   selectedCards: [],
+  lastError: null,
 
   // Actions
   connect: (roomId, playerId, ws) => {
@@ -81,6 +82,7 @@ const useGameStore = create((set, get) => ({
         break
 
       case 'error':
+        set({ lastError: msg.message })
         console.error('Server error:', msg.message)
         break
 
@@ -118,26 +120,42 @@ const useGameStore = create((set, get) => ({
   },
 
   submitAction: () => {
-    const { ws, selectedCards, legalActions } = get()
-    if (!ws || selectedCards.length === 0) return
+    const { ws, selectedCards, legalActions, myPlayerId } = get()
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      console.error('WebSocket not connected')
+      return
+    }
+    if (selectedCards.length === 0) return
 
+    // Find matching action by cards
     const matchingAction = legalActions.find((action) =>
       selectedCards.length === action.cards?.length &&
       selectedCards.every((sc) =>
-        action.cards.some(
+        action.cards?.some(
           (ac) => ac.suit === sc.suit && ac.rank === sc.rank
         )
       )
     )
 
-    if (matchingAction) {
-      ws.send(
-        JSON.stringify({
-          type: 'action',
-          cards: selectedCards,
-        })
-      )
+    if (!matchingAction) {
+      console.error('No matching action for selected cards')
+      return
+    }
+
+    // Send action to server
+    try {
+      const message = {
+        type: 'action',
+        cards: selectedCards.map((c) => ({
+          suit: c.suit,
+          rank: c.rank,
+          deck_id: c.deck_id || 0,
+        })),
+      }
+      ws.send(JSON.stringify(message))
       set({ selectedCards: [] })
+    } catch (error) {
+      console.error('Failed to send action:', error)
     }
   },
 

@@ -4,6 +4,7 @@ import PlayerSlot from './PlayerSlot'
 import TrickArea from './TrickArea'
 import TrumpDisplay from './TrumpDisplay'
 import Hand from './Hand'
+import Notification from './Notification'
 
 export default function GameTable() {
   const { connected, phase, currentPlayer, myPlayerId, connectedPlayers, roomId } = useGameStore()
@@ -55,6 +56,9 @@ export default function GameTable() {
 
       {/* Player's hand at the bottom */}
       <Hand />
+
+      {/* Notifications */}
+      <Notification />
     </div>
   )
 }
