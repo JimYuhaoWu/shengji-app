@@ -60,6 +60,13 @@ export default function GameTable() {
             <p>Waiting to connect...</p>
           </div>
         )}
+
+        {/* Late-joiner helper: show when game in progress but few players connected */}
+        {connected && phase === 'TRICK_PLAYING' && connectedCount <= 2 && (
+          <div className="info-banner">
+            ⏳ Waiting for other players to connect... ({connectedCount}/6 ready)
+          </div>
+        )}
       </div>
 
       {/* Phase-driven special actions (trump bid, kitty bury, call helper, next hand) */}

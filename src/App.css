@@ -399,6 +399,21 @@
   font-size: 16px;
 }
 
+.info-banner {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(100, 180, 200, 0.15);
+  border: 1px solid rgba(100, 180, 200, 0.3);
+  color: #64b5f6;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: slideUp 0.3s ease-out;
+}
+
 /* Card Component Styling */
 .card {
   width: 70px;
