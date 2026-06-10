@@ -4,6 +4,7 @@ import PlayerSlot from './PlayerSlot'
 import TrickArea from './TrickArea'
 import TrumpDisplay from './TrumpDisplay'
 import Hand from './Hand'
+import SpecialActions from './SpecialActions'
 import Notification from './Notification'
 
 export default function GameTable() {
@@ -53,6 +54,9 @@ export default function GameTable() {
           </div>
         )}
       </div>
+
+      {/* Phase-driven special actions (trump bid, kitty bury, call helper, next hand) */}
+      <SpecialActions />
 
       {/* Player's hand at the bottom */}
       <Hand />
