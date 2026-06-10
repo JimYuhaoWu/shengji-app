@@ -66,7 +66,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.02) 2px,
+      rgba(0, 0, 0, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.02) 2px,
+      rgba(0, 0, 0, 0.02) 4px
+    ),
+    linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
   color: var(--text);
   position: relative;
   overflow: hidden;
@@ -718,4 +733,489 @@
 
 .notification-close:hover {
   color: var(--text);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN: Mobile-First
+   ============================================================================ */
+
+/* Tablet: 640px–1024px */
+@media (max-width: 1024px) and (min-width: 640px) {
+  .hexagon-table {
+    width: 480px;
+    height: 400px;
+  }
+
+  .player-slot {
+    width: 100px;
+  }
+
+  .card {
+    width: 65px;
+    height: 97px;
+  }
+
+  .hand-container {
+    max-height: 140px;
+  }
+
+  .status-bar {
+    gap: 16px;
+    padding: 14px 16px;
+    font-size: 12px;
+  }
+
+  .trump-display {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile: < 640px (iPhone, mobile devices) */
+@media (max-width: 640px) {
+  /* Status bar */
+  .status-bar {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 11px;
+  }
+
+  .connection-status {
+    width: 100%;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .room-info,
+  .player-info,
+  .phase {
+    font-size: 10px;
+  }
+
+  .trump-container {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .trump-display {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+
+  /* Table layout: switch from hexagon to compact grid */
+  .table-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .table-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .hexagon-table {
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-width: 320px;
+  }
+
+  /* Override hexagon positioning with grid layout */
+  .player-0,
+  .player-1,
+  .player-2,
+  .player-3,
+  .player-4,
+  .player-5 {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+  }
+
+  /* Player 0 (dealer) at top, spans full width */
+  .player-0 {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  /* Players 1–2 on right column, 4–5 on left column */
+  .player-1,
+  .player-2 {
+    grid-column: 1;
+  }
+
+  .player-3 {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .player-4,
+  .player-5 {
+    grid-column: 2;
+  }
+
+  .player-slot {
+    width: 100%;
+    max-width: 90px;
+    justify-self: center;
+  }
+
+  .player-card {
+    padding: 8px;
+    border-radius: 6px;
+    gap: 6px;
+  }
+
+  .dealer-badge,
+  .helper-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .player-level {
+    font-size: 10px;
+  }
+
+  .player-name {
+    font-size: 11px;
+  }
+
+  .hand-preview {
+    gap: 3px;
+  }
+
+  .card-fan {
+    height: 30px;
+  }
+
+  .card-back {
+    width: 18px;
+    height: 27px;
+  }
+
+  .card-back.small {
+    width: 16px;
+    height: 24px;
+  }
+
+  .card-count {
+    font-size: 10px;
+  }
+
+  /* Center area: trick zone stays centered */
+  .center-area {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-top: 16px;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .trick-area {
+    max-width: 280px;
+    min-height: 70px;
+    padding: 12px;
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(200, 149, 74, 0.4);
+  }
+
+  .trick-cards {
+    gap: 16px;
+  }
+
+  .pile-label {
+    font-size: 11px;
+  }
+
+  /* Card styling for mobile */
+  .card {
+    width: 90px;
+    height: 135px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  .card:hover:not(.illegal) {
+    transform: translateY(-8px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  }
+
+  .card.selected {
+    transform: translateY(-18px) scale(1.05);
+    border-color: #c8954a;
+    box-shadow: 0 0 16px rgba(200, 149, 74, 0.8), 0 8px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Hand container */
+  .hand-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(20, 20, 20, 0.95);
+    border-top: 1px solid var(--border);
+    max-height: 200px;
+    width: 100%;
+  }
+
+  .hand {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 0;
+    align-items: flex-end;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  .no-cards {
+    padding: 6px 16px;
+    font-size: 13px;
+  }
+
+  .hand-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .submit-btn,
+  .clear-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 48px;
+  }
+
+  .submit-btn {
+    background: #c8954a;
+    color: #000;
+    border: 1px solid #c8954a;
+    font-weight: 500;
+  }
+
+  .submit-btn:hover:not(.disabled) {
+    background: #d8a55a;
+    box-shadow: 0 0 12px rgba(200, 149, 74, 0.4);
+  }
+
+  .submit-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .clear-btn {
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .clear-btn:hover {
+    border-color: var(--text);
+  }
+
+  .hand-status {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
+
+  /* Special actions panel */
+  .special-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(30, 30, 30, 0.98);
+    border-top: 2px solid #c8954a;
+    width: 100%;
+  }
+
+  .special-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #c8954a;
+  }
+
+  .special-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .current-bid {
+    font-size: 12px;
+    color: var(--text);
+    padding: 6px 10px;
+    background: rgba(200, 149, 74, 0.1);
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .bid-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .bid-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .bid-controls select {
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: rgba(50, 50, 50, 0.95);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .action-buttons .submit-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 48px;
+    border: 1px solid #c8954a;
+    background: #c8954a;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-buttons .submit-btn:hover:not(.disabled) {
+    background: #d8a55a;
+    box-shadow: 0 0 12px rgba(200, 149, 74, 0.4);
+  }
+
+  .action-buttons .submit-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .action-buttons .clear-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 48px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .action-buttons .clear-btn:hover {
+    border-color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* Notification container */
+  .notification-container {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: calc(100% - 24px);
+  }
+
+  .notification {
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    gap: 10px;
+  }
+
+  .notification-message {
+    font-size: 12px;
+  }
+
+  .notification-close {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+}
+
+/* Very small phones (< 380px) — ultra-compact */
+@media (max-width: 380px) {
+  .hexagon-table {
+    max-width: 100%;
+  }
+
+  .player-slot {
+    max-width: 80px;
+  }
+
+  .card {
+    width: 80px;
+    height: 120px;
+  }
+
+  .hand {
+    gap: 10px;
+  }
+
+  .status-bar {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .trump-display {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .submit-btn,
+  .clear-btn {
+    padding: 10px 12px;
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .hand-container {
+    padding: 10px 12px;
+    gap: 8px;
+  }
 }
