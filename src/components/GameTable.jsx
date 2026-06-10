@@ -5,6 +5,7 @@ import TrickArea from './TrickArea'
 import TrumpDisplay from './TrumpDisplay'
 import Hand from './Hand'
 import SpecialActions from './SpecialActions'
+import ReconnectBanner from './ReconnectBanner'
 import Notification from './Notification'
 
 export default function GameTable() {
@@ -22,6 +23,7 @@ export default function GameTable() {
 
   return (
     <div className="game-table">
+      <ReconnectBanner />
       <div className="status-bar">
         <div className={`connection-status ${connected ? 'connected' : 'disconnected'}`}>
           {connected ? '✓ Connected' : '◯ Disconnected'}

@@ -41,6 +41,8 @@ const useGameStore = create((set, get) => ({
   lastError: null,
   isSpectator: false,
   canInteract: true,
+  reconnectAttempts: 0,
+  maxReconnectAttempts: 5,
 
   // Actions
   connect: (roomId, playerId, ws) => {
@@ -219,6 +221,69 @@ const useGameStore = create((set, get) => ({
 
   clearSelection: () => {
     set({ selectedCards: [] })
+  },
+
+  // Reconnection logic
+  reconnect: () => {
+    const { roomId, myPlayerId, reconnectAttempts, maxReconnectAttempts } = get()
+
+    if (reconnectAttempts >= maxReconnectAttempts) {
+      set({ lastError: 'Max reconnection attempts reached' })
+      return
+    }
+
+    // If we don't have a room, can't reconnect
+    if (!roomId) {
+      set({ lastError: 'No room to reconnect to' })
+      return
+    }
+
+    set({ reconnectAttempts: reconnectAttempts + 1 })
+
+    try {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = myPlayerId !== null
+        ? `${wsProtocol}//${window.location.host}/ws/${roomId}/${myPlayerId}`
+        : `${wsProtocol}//${window.location.host}/ws/${roomId}/spectator`
+
+      const ws = new WebSocket(wsUrl)
+
+      ws.onopen = () => {
+        set({
+          ws,
+          connected: true,
+          reconnectAttempts: 0,
+          lastError: null,
+        })
+        console.log('Reconnected to server')
+      }
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data)
+          get().handleMessage(msg)
+        } catch (error) {
+          console.error('Failed to parse message:', error)
+        }
+      }
+
+      ws.onerror = () => {
+        set({ lastError: 'Connection failed. Retrying...' })
+      }
+
+      ws.onclose = () => {
+        set({ connected: false })
+        // Schedule another reconnect attempt
+        setTimeout(() => {
+          const { connected } = get()
+          if (!connected) {
+            get().reconnect()
+          }
+        }, 2000)
+      }
+    } catch (error) {
+      set({ lastError: error.message })
+    }
   },
 }))
 
