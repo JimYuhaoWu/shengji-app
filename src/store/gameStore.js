@@ -29,6 +29,11 @@ const useGameStore = create((set, get) => ({
   helperPlayers: [],
   kitty: null,            // dealer-only, during KITTY phase
   buriedCards: null,      // revealed at SCORING
+  // The server reports a connection COUNT, plus per-player connect/disconnect
+  // events. We track the authoritative count and a best-effort set of which
+  // seats we've seen connect (a late joiner only learns of seats that connect
+  // after it, since `joined` carries only a count).
+  connectedCount: 0,
   connectedPlayers: [],
 
   // Local UI state
@@ -61,11 +66,16 @@ const useGameStore = create((set, get) => ({
   handleMessage: (msg) => {
     switch (msg.type) {
       case 'joined':
-        set({
+        // connected_players here is a COUNT, not a list. We at least know our
+        // own seat is connected; other seats fill in via player_connected.
+        set((state) => ({
           myPlayerId: msg.player_id,
           roomId: msg.room_id,
-          connectedPlayers: msg.connected_players || [],
-        })
+          connectedCount: msg.connected_players ?? state.connectedCount,
+          connectedPlayers: state.connectedPlayers.includes(msg.player_id)
+            ? state.connectedPlayers
+            : [...state.connectedPlayers, msg.player_id],
+        }))
         break
 
       case 'state_update':
@@ -99,9 +109,18 @@ const useGameStore = create((set, get) => ({
         break
 
       case 'player_connected':
+        set((state) => ({
+          connectedCount: msg.connected_count ?? state.connectedCount,
+          connectedPlayers: state.connectedPlayers.includes(msg.player_id)
+            ? state.connectedPlayers
+            : [...state.connectedPlayers, msg.player_id],
+        }))
+        break
+
       case 'player_disconnected':
         set((state) => ({
-          connectedPlayers: msg.connected_players || state.connectedPlayers,
+          connectedCount: msg.connected_count ?? state.connectedCount,
+          connectedPlayers: state.connectedPlayers.filter((id) => id !== msg.player_id),
         }))
         break
 

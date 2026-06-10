@@ -8,7 +8,7 @@ import SpecialActions from './SpecialActions'
 import Notification from './Notification'
 
 export default function GameTable() {
-  const { connected, phase, currentPlayer, myPlayerId, connectedPlayers, roomId } = useGameStore()
+  const { connected, phase, currentPlayer, myPlayerId, connectedCount, roomId } = useGameStore()
 
   const roomParam = new URLSearchParams(window.location.search).get('room') || 'default'
   const playerParam = new URLSearchParams(window.location.search).get('player')
@@ -26,6 +26,7 @@ export default function GameTable() {
         </div>
         {roomId && <div className="room-info">Room: {roomId}</div>}
         {myPlayerId !== null && <div className="player-info">Player: {myPlayerId}</div>}
+        {connected && <div className="player-info">{connectedCount}/6 connected</div>}
         {phase && <div className="phase">Phase: {phase}</div>}
         <div className="trump-container">
           <TrumpDisplay />
