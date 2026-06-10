@@ -39,14 +39,19 @@ const useGameStore = create((set, get) => ({
   // Local UI state
   selectedCards: [],
   lastError: null,
+  isSpectator: false,
+  canInteract: true,
 
   // Actions
   connect: (roomId, playerId, ws) => {
+    const isSpectator = playerId === null
     set({
       roomId,
       myPlayerId: playerId,
       ws,
       connected: true,
+      isSpectator,
+      canInteract: !isSpectator,
     })
   },
 

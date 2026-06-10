@@ -18,11 +18,21 @@ export default function Hand() {
     trumpSuit,
     trumpLevel,
     lastError,
+    isSpectator,
     selectCard,
     submitAction,
     clearSelection,
   } = useGameStore()
   const { addNotification } = useNotificationStore()
+
+  // Spectators cannot play cards
+  if (isSpectator) {
+    return (
+      <div className="hand-container">
+        <div className="hand-status">You are spectating</div>
+      </div>
+    )
+  }
 
   const isYourTurn = currentPlayer === myPlayerId
   const sortedHand = sortHand(myHand, trumpSuit, trumpLevel)

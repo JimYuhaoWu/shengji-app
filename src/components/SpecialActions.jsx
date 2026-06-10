@@ -176,8 +176,11 @@ function NextGame() {
 }
 
 export default function SpecialActions() {
-  const { phase, currentPlayer, myPlayerId } = useGameStore()
+  const { phase, currentPlayer, myPlayerId, isSpectator } = useGameStore()
   const isYourTurn = currentPlayer === myPlayerId
+
+  // Spectators cannot take actions
+  if (isSpectator) return null
 
   // SCORING is open to everyone; the rest require it to be your turn.
   if (phase === 'SCORING') return <NextGame />

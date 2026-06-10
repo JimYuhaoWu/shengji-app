@@ -5,10 +5,13 @@ export function useWebSocket(roomId, playerId) {
   const { connect, handleMessage, disconnect } = useGameStore()
 
   useEffect(() => {
-    if (!roomId || playerId === null) return
+    if (!roomId) return
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${wsProtocol}//${window.location.host}/ws/${roomId}/${playerId}`
+    // For spectators (playerId === null), connect with a spectator marker
+    const wsUrl = playerId !== null
+      ? `${wsProtocol}//${window.location.host}/ws/${roomId}/${playerId}`
+      : `${wsProtocol}//${window.location.host}/ws/${roomId}/spectator`
 
     const ws = new WebSocket(wsUrl)
 

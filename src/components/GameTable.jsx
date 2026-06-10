@@ -8,12 +8,14 @@ import SpecialActions from './SpecialActions'
 import Notification from './Notification'
 
 export default function GameTable() {
-  const { connected, phase, currentPlayer, myPlayerId, connectedCount, roomId } = useGameStore()
+  const { connected, phase, currentPlayer, myPlayerId, connectedCount, roomId, isSpectator } = useGameStore()
 
   const roomParam = new URLSearchParams(window.location.search).get('room') || 'default'
   const playerParam = new URLSearchParams(window.location.search).get('player')
+  // playerId is null if not provided (spectator mode) or a number if provided
+  const playerId = playerParam !== null ? parseInt(playerParam) : null
 
-  useWebSocket(roomParam, playerParam ? parseInt(playerParam) : null)
+  useWebSocket(roomParam, playerId)
 
   // Player slots arranged in hexagon: 0 (top), 1,2 (top-right/left), 3,4 (bottom-right/left), 5 (bottom)
   const playerPositions = [0, 1, 2, 3, 4, 5]
@@ -25,6 +27,7 @@ export default function GameTable() {
           {connected ? '✓ Connected' : '◯ Disconnected'}
         </div>
         {roomId && <div className="room-info">Room: {roomId}</div>}
+        {isSpectator && <div className="player-info spectator-badge">👁️ Spectating</div>}
         {myPlayerId !== null && <div className="player-info">Player: {myPlayerId}</div>}
         {connected && <div className="player-info">{connectedCount}/6 connected</div>}
         {phase && <div className="phase">Phase: {phase}</div>}
