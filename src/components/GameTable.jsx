@@ -6,6 +6,7 @@ import TrumpDisplay from './TrumpDisplay'
 import Hand from './Hand'
 import SpecialActions from './SpecialActions'
 import ReconnectBanner from './ReconnectBanner'
+import GameOverScreen from './GameOverScreen'
 import Notification from './Notification'
 
 export default function GameTable() {
@@ -63,6 +64,9 @@ export default function GameTable() {
 
       {/* Phase-driven special actions (trump bid, kitty bury, call helper, next hand) */}
       <SpecialActions />
+
+      {/* Game-over results screen */}
+      <GameOverScreen />
 
       {/* Player's hand at the bottom */}
       <Hand />
