@@ -1,11 +1,17 @@
 import useGameStore from '../store/gameStore'
 
 export default function ReconnectBanner() {
-  const { connected, lastError, reconnect, reconnectAttempts, maxReconnectAttempts } = useGameStore()
+  const { connected, lastError, reconnectAttempts, maxReconnectAttempts } = useGameStore()
 
   if (connected) return null
 
   const isMaxed = reconnectAttempts >= maxReconnectAttempts
+
+  // Recovery is a full page reload, which re-runs the single useWebSocket owner.
+  // We deliberately do NOT call the store's reconnect(), which opened a second,
+  // parallel socket on a self-perpetuating timer and fought useWebSocket for the
+  // seat (causing 403 "already connected" storms).
+  const retry = () => window.location.reload()
 
   return (
     <div className="reconnect-banner">
@@ -30,16 +36,9 @@ export default function ReconnectBanner() {
             </>
           )}
         </div>
-        {!isMaxed && (
-          <button className="reconnect-button" onClick={reconnect}>
-            Retry now
-          </button>
-        )}
-        {isMaxed && (
-          <button className="reconnect-button" onClick={() => window.location.reload()}>
-            Refresh page
-          </button>
-        )}
+        <button className="reconnect-button" onClick={retry}>
+          {isMaxed ? 'Refresh page' : 'Retry now'}
+        </button>
       </div>
     </div>
   )

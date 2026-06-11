@@ -187,6 +187,10 @@ export default function SpecialActions() {
   if (!isYourTurn) return null
 
   switch (phase) {
+    // Trump is declared *during* dealing in this engine: the server sends
+    // BID_TRUMP / PASS_TRUMP legal actions while the phase is still DEALING,
+    // and again in the dedicated TRUMP_DECLARATION phase. Render the panel for both.
+    case 'DEALING':
     case 'TRUMP_DECLARATION':
       return <TrumpDeclaration />
     case 'KITTY':

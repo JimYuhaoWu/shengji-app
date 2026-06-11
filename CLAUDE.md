@@ -465,3 +465,45 @@ server: {
 ```
 
 This allows the client to use relative URLs (e.g., `ws://localhost:5173/ws/...`) which get forwarded to the backend. In production, a reverse proxy does the same.
+
+## Session Log — 2026-06-11 (live-playtest bug fixes)
+
+Fixes from a human-vs-5-AI playtest. Two themes: a duplicate-WebSocket storm that
+prevented the human from holding a seat, and several "data was there but never
+rendered / not actionable" UI gaps.
+
+**Connection stability (the "I cannot connect" storm):**
+1. **`main.jsx` — removed `<StrictMode>`.** In dev it double-invoked the
+   `useWebSocket` effect, opening two sockets to the same seat; the second was
+   rejected and its `onclose` tore down the live one.
+2. **`hooks/useWebSocket.js` — hardened teardown.** Added a `cancelled` guard so a
+   closing socket's stale `onclose` can't call the store's `disconnect()` and kill
+   a newer connection; cleanup nulls all handlers and always `close()`s.
+3. **`components/ReconnectBanner.jsx` — reload instead of a parallel socket.** Both
+   buttons now `window.location.reload()`. The old store `reconnect()` opened a
+   second socket on a self-perpetuating 2s timer that fought `useWebSocket` for the
+   seat. (The server-side seat-takeover fix is the real backstop — see
+   shengji-server session log.)
+
+**Rendering / actionability:**
+4. **`components/SpecialActions.jsx` — show the trump bid panel during `DEALING`.**
+   Trump bidding overlaps dealing in the engine; `DEALING` now falls through to the
+   `TRUMP_DECLARATION` UI so the bid/pass buttons appear while cards are dealt.
+5. **`components/TrickArea.jsx` — render played cards face-up** (was a card back).
+6. **`components/GameTable.jsx` — show the called helper card** (`calledRank`/
+   `calledSuit`) in the status bar; the data was in the store but never displayed.
+7. **`components/Hand.jsx` — orange hint when the selection isn't a complete legal
+   combo** (a combo must be a single, a full pair/trio of identical cards, or a full
+   tractor). Clarifies why the Play button is disabled. Also note (engine semantics):
+   a "trio" is **3 identical cards** (same rank+suit, different decks), not 3
+   different cards.
+8. **`App.css` — styles** for `.trick-card`, `.called-helper`/`.called-card`,
+   `.play-hint`.
+
+### Known issue (NOT yet handled)
+
+- The note above — *"`legal_actions_truncated` only appears during KITTY"* — holds
+  today only because KITTY is the sole phase above the server's 500-action cap. The
+  UI relies on `legal_actions` being a complete list; if the server ever truncated a
+  non-KITTY phase, free card selection would break. Tracked on the server/AI side
+  (make the bury signal phase-explicit). See shengji-server / shengji-ai session logs.

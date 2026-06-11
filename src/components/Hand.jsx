@@ -84,6 +84,7 @@ export default function Hand() {
   // The Hand's own Play button only applies to card-play phases. Trump/kitty/
   // helper phases are driven by SpecialActions.
   const showPlayButton = isYourTurn && !isKitty && selectedCards.length > 0
+  const canPlay = matchesLegalAction()
 
   return (
     <div className="hand-container">
@@ -108,15 +109,21 @@ export default function Hand() {
       {showPlayButton && (
         <div className="hand-actions">
           <button
-            className={`submit-btn ${matchesLegalAction() ? '' : 'disabled'}`}
+            className={`submit-btn ${canPlay ? '' : 'disabled'}`}
             onClick={handleSubmit}
-            disabled={!matchesLegalAction()}
+            disabled={!canPlay}
           >
             Play ({selectedCards.length})
           </button>
           <button className="clear-btn" onClick={clearSelection}>
             Clear
           </button>
+          {!canPlay && (
+            <span className="play-hint">
+              Not a complete legal play — a combo must be a single, a full pair/trio
+              (identical cards), or a full tractor. Adjust or Clear.
+            </span>
+          )}
         </div>
       )}
     </div>

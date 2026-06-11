@@ -337,6 +337,40 @@
   position: relative;
 }
 
+.trick-card {
+  width: 48px;
+  height: 72px;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  margin: 0 -10px;
+}
+
+.trick-card:first-child {
+  margin-left: 0;
+}
+
+.called-helper {
+  font-size: 13px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.called-helper .called-card {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.play-hint {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  color: #ff9800;
+  max-width: 360px;
+}
+
 .trump-container {
   margin-left: auto;
   display: flex;

@@ -1,4 +1,5 @@
 import useGameStore from '../store/gameStore'
+import { cardImagePath } from '../utils/cardUtils'
 
 export default function TrickArea() {
   const { currentTrick } = useGameStore()
@@ -14,10 +15,14 @@ export default function TrickArea() {
           <div key={idx} className="trick-pile">
             <div className="pile-label">P{playerId}</div>
             <div className="pile-cards">
-              {cards?.slice(0, 3).map((card, i) => (
-                <div key={i} className="card-back small" />
+              {cards?.map((card, i) => (
+                <img
+                  key={i}
+                  className="trick-card"
+                  src={cardImagePath(card)}
+                  alt={`${card.rank}${card.suit}`}
+                />
               ))}
-              {cards?.length > 3 && <span className="card-count">+{cards.length - 3}</span>}
             </div>
           </div>
         ))}

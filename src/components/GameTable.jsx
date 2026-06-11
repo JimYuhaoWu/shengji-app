@@ -10,7 +10,10 @@ import GameOverScreen from './GameOverScreen'
 import Notification from './Notification'
 
 export default function GameTable() {
-  const { connected, phase, currentPlayer, myPlayerId, connectedCount, roomId, isSpectator } = useGameStore()
+  const { connected, phase, currentPlayer, myPlayerId, connectedCount, roomId, isSpectator, calledRank, calledSuit } = useGameStore()
+
+  const suitSymbol = { H: '♥', D: '♦', C: '♣', S: '♠' }
+  const suitIsRed = calledSuit === 'H' || calledSuit === 'D'
 
   const roomParam = new URLSearchParams(window.location.search).get('room') || 'default'
   const playerParam = new URLSearchParams(window.location.search).get('player')
@@ -34,6 +37,14 @@ export default function GameTable() {
         {myPlayerId !== null && <div className="player-info">Player: {myPlayerId}</div>}
         {connected && <div className="player-info">{connectedCount}/6 connected</div>}
         {phase && <div className="phase">Phase: {phase}</div>}
+        {calledRank && calledSuit && (
+          <div className="called-helper" title="The dealer's partner is whoever holds this card">
+            Helper card:{' '}
+            <span className="called-card" style={{ color: suitIsRed ? '#e63946' : '#e0e0e0' }}>
+              {calledRank}{suitSymbol[calledSuit] || calledSuit}
+            </span>
+          </div>
+        )}
         <div className="trump-container">
           <TrumpDisplay />
         </div>
